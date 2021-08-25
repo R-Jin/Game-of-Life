@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 import pygame
 import sys
+from copy import deepcopy
 
-res = (w, h) = (1000, 1000)
+res = (w, h) = (700, 700)
 screen = pygame.display.set_mode(res)
 grid = []
 active_sim = False
@@ -22,7 +23,7 @@ def count_alive(grid, x, y):
 def start_sim(grid):
     """ Begin the simulation """
 
-    new_grid = grid
+    new_grid = deepcopy(grid)
 
     for row in range(len(grid)):
         for col in range(len(grid)):
@@ -112,7 +113,7 @@ def main():
 
         if active_sim:
             grid = start_sim(grid)
-            pygame.time.delay(1000)
+            pygame.time.delay(500)
 
         pygame.display.update()
 
