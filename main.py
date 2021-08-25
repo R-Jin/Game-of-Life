@@ -7,6 +7,38 @@ screen = pygame.display.set_mode(res)
 grid = []
 active_sim = False
 
+def count_alive(grid, x, y):
+    count = 0
+    surrounding = [(x - 1, y + 1), (x, y + 1), (x + 1, y + 1),
+                   (x - 1, y),                 (x + 1, y),
+                   (x - 1, y - 1) , (x, y - 1), (x + 1, y - 1)]
+
+    for pos in surrounding:
+        if grid[pos[0]][pos[1]]:
+            count += 1
+
+    return count
+
+def start_sim(grid):
+    """ Begin the simulation """
+
+    new_grid = grid
+
+    for row in range(len(grid)):
+        for col in range(len(grid)):
+            if not (col == 0 or row == 0 or col == len(grid) - 1 or row == len(grid) - 1):
+                # See if a living cell will survive or die
+                if grid[row][col]:
+                    if count_alive(grid, row, col) < 2 or count_alive(grid, row, col) > 3:
+                        new_grid[row][col] = 0
+
+                # See if a dead cell will live
+                else:
+                    if count_alive(grid, row, col) == 3:
+                        new_grid[row][col] = 1
+
+    return new_grid
+
 def draw_cells(grid):
     """ Draw the cells depending on what state they are in. White for living and black for dead """
 
@@ -50,6 +82,8 @@ def clicked(grid):
 def main():
     """ Main function """
 
+    global active_sim
+
     pygame.init()
 
     grid = gen_grid(50)
@@ -65,8 +99,20 @@ def main():
                 pygame.quit()
                 sys.exit(0)
 
+            # Mouse inputs
             elif event.type == pygame.MOUSEBUTTONDOWN:
-                grid = clicked(grid)
+                if not active_sim:
+                    grid = clicked(grid)
+
+            # Keyboard inputs
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE:
+                    active_sim = not active_sim
+
+
+        if active_sim:
+            grid = start_sim(grid)
+            pygame.time.delay(1000)
 
         pygame.display.update()
 
